@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cert-manager-issuers
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_cert_manager
+              operator: In
+              values: ['true']
+  template:
+    metadata:
+      name: cert-manager-issuers
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io/background
+      annotations:
+        argocd.argoproj.io/sync-wave: "40"
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - path: 'cert-manager-issuers'
+          repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+          targetRevision: 'main'
+          helm:
+            releaseName: cert-manager-issuers
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/config/cert-manager-issuers/values.yaml
+              - $values/config/cert-manager-issuers/{{.metadata.labels.environment}}.yaml
+              - $values/config/cert-manager-issuers/{{.metadata.labels.cloud_provider}}.yaml
+            values: |
+              acme:
+                registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
+                http01:
+                  enabled: {{.metadata.annotations.enable_ingress_nginx}}
+                  ingressClassName: {{.metadata.annotations.ingress_nginx_ingressclass_name}}
+                dns01:
+                  enabled: {{.metadata.annotations.enable_cert_manager_dns01_designate}}
+                  solver:
+                    webhook:
+                      groupName: acme.syseleven.de
+                      solverName: designatedns
+      destination:
+        name: '{{.name}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+        - CreateNamespace=true
