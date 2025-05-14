@@ -19,8 +19,6 @@ spec:
       name: cert-manager-issuers
       finalizers:
         - resources-finalizer.argocd.argoproj.io/background
-      annotations:
-        argocd.argoproj.io/sync-wave: "40"
     spec:
       project: default
       sources:

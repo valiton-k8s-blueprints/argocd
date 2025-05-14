@@ -35,8 +35,6 @@ spec:
   template:
     metadata:
       name: 'cert-manager-designate-webhook'
-      annotations:
-        argocd.argoproj.io/sync-wave: "30"
     spec:
       project: default
       sources:
