@@ -6,7 +6,7 @@ metadata:
 spec:
   goTemplate: true
   syncPolicy:
-    preserveResourcesOnDeletion: false
+    preserveResourcesOnDeletion: true
   generators:
     - merge:
         mergeKeys: [server]
@@ -38,8 +38,6 @@ spec:
   template:
     metadata:
       name: '{{.values.addonChart}}'
-      finalizers:
-        - resources-finalizer.argocd.argoproj.io/background
     spec:
       project: default
       sources:
