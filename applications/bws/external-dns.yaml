@@ -1,0 +1,86 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: external-dns
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: external-dns
+                # anything not staging or prod use this version
+                addonChartVersion: 1.16.1
+                addonChartRepository: https://kubernetes-sigs.github.io/external-dns
+              selector:
+                matchExpressions:
+                  - key: enable_external_dns
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
+              values:
+                addonChartVersion: 1.16.1
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: production
+              values:
+                addonChartVersion: 1.16.1
+  template:
+    metadata:
+      name: '{{.values.addonChart}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - chart: '{{.values.addonChart}}'
+          repoURL: '{{.values.addonChartRepository}}'
+          targetRevision: '{{.values.addonChartVersion}}'
+          helm:
+            releaseName: '{{.values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/config/{{.values.addonChart}}/values.yaml
+              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+              - $values/config/{{.values.addonChart}}/{{.metadata.labels.cloud_provider}}.yaml
+            values: |
+              domainFilters: {{.metadata.annotations.external_dns_domain_filters}}
+              policy: {{default "upsert-only" .metadata.annotations.external_dns_policy}}
+              provider:
+                name: webhook
+                webhook:
+                  image:
+                    repository: ghcr.io/inovex/external-dns-openstack-webhook
+                    tag: "1.0.0"
+                  extraVolumeMounts:
+                    - name: cloudsyaml
+                      mountPath: /etc/openstack/
+                  env:
+                    - name: OS_CLOUD
+                      value: '{{.metadata.annotations.external_dns_designate_cloud_name}}'
+                  resources: {}
+                  securityContext:
+                    runAsUser: 1000
+              extraVolumes:
+                - name: cloudsyaml
+                  secret:
+                    secretName: '{{.metadata.annotations.external_dns_designate_secret_name}}'
+
+      destination:
+        namespace: '{{.metadata.annotations.external_dns_namespace}}'
+        name: '{{.name}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

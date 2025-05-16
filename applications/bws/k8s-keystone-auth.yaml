@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: k8s-keystone-auth
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - clusters: {}
+  template:
+    metadata:
+      name: k8s-keystone-auth
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+        path: 'bws/k8s-keystone-auth'
+        targetRevision: 'main'
+        helm:
+          releaseName: k8s-keystone-auth
+          values: |
+            imageTag: v1.32.0
+            authUrl: {{.metadata.annotations.openstack_auth_url}}
+      destination:
+        name: '{{.name}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+        - CreateNamespace=true

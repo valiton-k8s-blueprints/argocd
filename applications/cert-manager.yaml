@@ -1,0 +1,67 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cert-manager
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: cert-manager
+                addonChartVersion: 1.17.1
+                addonChartRepository: https://charts.jetstack.io
+              selector:
+                matchExpressions:
+                  - key: enable_cert_manager
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
+              values:
+                addonChartVersion: 1.17.1
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: production
+              values:
+                addonChartVersion: 1.17.1
+  template:
+    metadata:
+      name: '{{.values.addonChart}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - chart: '{{.values.addonChart}}'
+          repoURL: '{{.values.addonChartRepository}}'
+          targetRevision: '{{.values.addonChartVersion}}'
+          helm:
+            releaseName: '{{.values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/config/{{.values.addonChart}}/values.yaml
+              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+              - $values/config/{{.values.addonChart}}/{{.metadata.labels.cloud_provider}}.yaml
+            values: |
+              crds:
+                enabled: true
+              serviceAccount:
+                name: {{.metadata.annotations.cert_manager_service_account_name}}
+      destination:
+        namespace: '{{.metadata.annotations.cert_manager_namespace}}'
+        name: '{{.name}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

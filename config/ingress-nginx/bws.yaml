@@ -1,0 +1,8 @@
+controller:
+  config:
+    use-proxy-protocol: "true"
+  service:
+    externalTrafficPolicy: "Local"
+    annotations:
+      loadbalancer.openstack.org/proxy-protocol: "true"
+      loadbalancer.openstack.org/enable-health-monitor: "true"
