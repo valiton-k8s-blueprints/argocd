@@ -1,3 +1,4 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
@@ -8,18 +9,45 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - clusters: {}
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                addonChart: openstack-cloud-controller-manager
+                addonChartRepository: https://kubernetes.github.io/cloud-provider-openstack
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: production
   template:
     metadata:
-      name: openstack-cloud-controller-manager
+      name: '{{.values.addonChart}}'
     spec:
       project: default
-      source:
-        repoURL: 'https://github.com/kubernetes/cloud-provider-openstack.git'
-        path: 'manifests/controller-manager'
-        targetRevision: 'v1.32.0'
-        directory:
-          include: "{cloud-controller-manager-roles.yaml,cloud-controller-manager-role-bindings.yaml,openstack-cloud-controller-manager-ds.yaml}"
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - chart: '{{.values.addonChart}}'
+          repoURL: '{{.values.addonChartRepository}}'
+          targetRevision: '2.32.0'
+          helm:
+            releaseName: '{{.values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/config/{{.values.addonChart}}/values.yaml
+              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+            values: |
+              secret:
+                enabled: true
+                create: false
+              cluster:
+                name: {{.name}}
       destination:
         namespace: kube-system
         name: '{{.name}}'
@@ -27,4 +55,3 @@ spec:
         automated: {}
         syncOptions:
           - CreateNamespace=true
-

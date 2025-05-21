@@ -3,6 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: cert-manager-designate-webhook
+  namespace: argocd
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
@@ -13,8 +14,8 @@ spec:
         generators:
           - clusters:
               values:
-                addonChartVersion: helm-0.6.2
-                addonChartRepository: https://github.com/syseleven/designate-certmanager-webhook.git
+                addonChartVersion: v0.1.2
+                addonChartRepository: ghcr.io/stackitcloud/charts
               selector:
                 matchExpressions:
                   - key: enable_cert_manager_designate_webhook
@@ -25,13 +26,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: helm-0.6.2
+                addonChartVersion: v0.1.2
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: helm-0.6.2
+                addonChartVersion: v0.1.2
   template:
     metadata:
       name: 'cert-manager-designate-webhook'
@@ -41,7 +42,8 @@ spec:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - path: helm/designate-certmanager-webhook
+        - path: designate-certmanager-webhook
+          chart: designate-certmanager-webhook
           repoURL: '{{.values.addonChartRepository}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
@@ -56,7 +58,7 @@ spec:
                 namespace: {{.metadata.annotations.cert_manager_namespace}}
                 serviceAccountName: {{.metadata.annotations.cert_manager_service_account_name}}
       destination:
-        namespace: '{{.metadata.annotations.cert_manager_designate_webhook_namespace}}'
+        namespace: '{{.metadata.annotations.cert_manager_namespace}}'
         name: '{{.name}}'
       syncPolicy:
         automated: {}
