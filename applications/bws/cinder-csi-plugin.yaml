@@ -2,7 +2,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: cinder-csi-plugin
+  name: openstack-cinder-csi
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -13,8 +14,8 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: cinder-csi-plugin
-                addonChartRepository: https://github.com/kubernetes/cloud-provider-openstack
+                addonChart: openstack-cinder-csi
+                addonChartRepository: https://kubernetes.github.io/cloud-provider-openstack
               selector:
                 matchExpressions:
                   - key: enable_cinder_csi_plugin
@@ -37,9 +38,9 @@ spec:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - path: charts/cinder-csi-plugin
+        - chart: '{{.values.addonChart}}'
           repoURL: '{{.values.addonChartRepository}}'
-          targetRevision: 'v1.32.0'
+          targetRevision: '2.32.0'
           helm:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
@@ -64,6 +65,8 @@ spec:
         namespace: '{{.metadata.annotations.cinder_csi_plugin_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true

@@ -3,6 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: cert-manager
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -61,7 +62,9 @@ spec:
         namespace: '{{.metadata.annotations.cert_manager_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
