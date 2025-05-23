@@ -65,6 +65,8 @@ spec:
         namespace: '{{.metadata.annotations.cinder_csi_plugin_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true

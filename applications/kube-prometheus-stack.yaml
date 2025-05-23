@@ -60,7 +60,9 @@ spec:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true

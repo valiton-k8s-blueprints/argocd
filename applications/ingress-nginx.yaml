@@ -67,6 +67,8 @@ spec:
         namespace: '{{.metadata.annotations.ingress_nginx_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true

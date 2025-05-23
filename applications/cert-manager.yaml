@@ -62,7 +62,9 @@ spec:
         namespace: '{{.metadata.annotations.cert_manager_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
