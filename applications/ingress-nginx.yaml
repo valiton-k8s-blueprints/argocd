@@ -3,6 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: ingress-nginx
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -66,6 +67,8 @@ spec:
         namespace: '{{.metadata.annotations.ingress_nginx_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true

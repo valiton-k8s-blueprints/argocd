@@ -3,6 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: metrics-server
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -63,7 +64,9 @@ spec:
         namespace: '{{.values.addonChartNamespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
+        automated:
+          prune: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true

@@ -3,6 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: argocd
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -15,7 +16,7 @@ spec:
               values:
                 addonChart: argo-cd
                 # anything not staging or prod use this version
-                addonChartVersion: 7.8.26
+                addonChartVersion: 8.0.9
                 addonChartRepositoryNamespace: argocd
                 addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
@@ -28,13 +29,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 7.8.26
+                addonChartVersion: 8.0.9
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 7.8.26
+                addonChartVersion: 8.0.9
   template:
     metadata:
       name: '{{.values.addonChart}}'
@@ -71,6 +72,7 @@ spec:
       syncPolicy:
         automated:
           prune: false
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
