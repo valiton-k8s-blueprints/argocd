@@ -49,9 +49,9 @@ spec:
           helm:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
-          valueFiles:
-            - $values/config/{{.values.addonChart}}/values.yaml
-            - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+            valueFiles:
+              - $values/config/{{.values.addonChart}}/values.yaml
+              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
       destination:
         name: '{{name}}'
       syncPolicy:
