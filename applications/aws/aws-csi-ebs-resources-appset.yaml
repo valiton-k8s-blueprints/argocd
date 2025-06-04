@@ -53,7 +53,7 @@ spec:
               - $values/config/{{.values.addonChart}}/values.yaml
               - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
       destination:
-        name: '{{name}}'
+        name: '{{.name}}'
       syncPolicy:
         automated:
           prune: false
