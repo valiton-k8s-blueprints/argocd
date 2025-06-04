@@ -20,7 +20,7 @@ spec:
                 addonChartRepository: https://kubernetes.github.io/ingress-nginx
               selector:
                 matchExpressions:
-                  - key: enable_external_dns
+                  - key: enable_nginx
                     operator: In
                     values: ['true']
           - clusters:
