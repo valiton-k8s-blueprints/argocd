@@ -1,0 +1,3 @@
+credentialsSecret: "designate-auth"
+certManager:
+  serviceAccountName: "cert-manager"

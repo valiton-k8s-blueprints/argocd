@@ -54,10 +54,7 @@ spec:
               - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
               - $values/config/{{.values.addonChart}}/{{.metadata.labels.cloud_provider}}.yaml
             values: |
-              crds:
-                enabled: true
-              serviceAccount:
-                name: {{.metadata.annotations.cert_manager_service_account_name}}
+              {{.metadata.annotations.cert_manager_cloud_provider_values | default ""}}
       destination:
         namespace: '{{.metadata.annotations.cert_manager_namespace}}'
         name: '{{.name}}'

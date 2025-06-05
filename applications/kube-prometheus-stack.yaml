@@ -56,6 +56,8 @@ spec:
               - $values/config/kube-prometheus-stack/values.yaml
               - $values/config/kube-prometheus-stack/{{.metadata.labels.environment}}.yaml
               - $values/config/kube-prometheus-stack/{{.metadata.labels.cloud_provider}}.yaml
+            values: |
+              {{.metadata.annotations.kube_prometheus_stack_cloud_provider_values | default ""}}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
         name: '{{.name}}'

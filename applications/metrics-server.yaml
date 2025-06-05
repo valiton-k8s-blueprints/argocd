@@ -56,10 +56,7 @@ spec:
               - $values/config/metrics-server/{{.metadata.labels.environment}}.yaml
               - $values/config/metrics-server/{{.metadata.labels.cloud_provider}}.yaml
             values: |
-              {{- if .metadata.annotations.base_nodepool_labels}}
-              nodeSelector:
-                {{.metadata.annotations.base_nodepool_labels}}
-              {{- end }}
+              {{.metadata.annotations.metrics_server_cloud_provider_values | default ""}}
       destination:
         namespace: '{{.values.addonChartNamespace}}'
         name: '{{.name}}'
