@@ -8,7 +8,12 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
   generators:
-    - clusters: {}
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_karpenter
+              operator: In
+              values: ['true']
   template:
     metadata:
       name: karpenter-crs
@@ -27,12 +32,12 @@ spec:
           values: |
             karpenter:
               settings: 
-                clusterName: {{metadata.annotations.aws_cluster_name}}
+                clusterName: {{.metadata.annotations.aws_cluster_name}}
                 eks_image:
-                  x86_64: {{metadata.annotations.eks_image_x86_64}}
-                  arm64: {{metadata.annotations.eks_image_arm64}}
+                  x86_64: {{.metadata.annotations.eks_image_x86_64}}
+                  arm64: {{.metadata.annotations.eks_image_arm64}}
       destination:
-        name: '{{name}}'
+        name: '{{.name}}'
       syncPolicy:
         automated:
           allowEmpty: true
