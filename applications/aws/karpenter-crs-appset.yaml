@@ -17,7 +17,6 @@ spec:
       project: default
       sources:
       - repoURL: '{{.metadata.annotations.applications_repo_url}}'
-        path: '{{metadata.annotations.oss_workload_repo_basepath}}{{metadata.annotations.oss_workload_repo_path}}'
         targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
       - path: 'karpenter-crs'
         repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
