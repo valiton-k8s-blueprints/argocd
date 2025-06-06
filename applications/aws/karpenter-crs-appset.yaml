@@ -27,7 +27,7 @@ spec:
         ref: values
       - path: 'aws/karpenter-crs'
         repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
-        targetRevision: 'feature/aws'
+        targetRevision: 'main'
         helm:
           values: |
             karpenter:
