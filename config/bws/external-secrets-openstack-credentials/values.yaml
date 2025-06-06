@@ -1,0 +1,15 @@
+clusterSecretStore:
+  name: cluster-secrets
+  namespaces:
+    matchLabels:
+      access-cluster-secrets: "true"
+
+certManagerDesignateWebhook:
+  secretName: designate-auth
+
+cinderCsiPlugin:
+  secretName: cinder-csi-plugin-secret
+
+externalDns:
+  secretName: external-dns-designate-secret
+  cloudName: cloud

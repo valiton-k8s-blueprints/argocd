@@ -66,7 +66,7 @@ spec:
               clusterID: '{{.metadata.annotations.cluster_name}}'
               secret:
                 enabled: true
-                name: '{{.metadata.annotations.cinder_csi_plugin_secret_name}}'
+                name: "cinder-csi-plugin-secret"
               csi:
                 plugin:
                   volumes:

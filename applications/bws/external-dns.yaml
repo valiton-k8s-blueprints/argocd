@@ -68,15 +68,14 @@ spec:
                       mountPath: /etc/openstack/
                   env:
                     - name: OS_CLOUD
-                      value: '{{.metadata.annotations.external_dns_designate_cloud_name}}'
+                      value: cloud
                   resources: {}
                   securityContext:
                     runAsUser: 1000
               extraVolumes:
                 - name: cloudsyaml
                   secret:
-                    secretName: '{{.metadata.annotations.external_dns_designate_secret_name}}'
-
+                    secretName: "external-dns-designate-secret"
       destination:
         namespace: '{{.metadata.annotations.external_dns_namespace}}'
         name: '{{.name}}'
