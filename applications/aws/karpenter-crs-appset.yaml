@@ -4,6 +4,7 @@ metadata:
   name: karpenter-crs
   namespace: argocd
 spec:
+  goTemplate: true
   syncPolicy:
     preserveResourcesOnDeletion: false
   generators:
