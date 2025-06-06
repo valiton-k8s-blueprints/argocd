@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: karpenter-crs
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_karpenter
+              operator: In
+              values: ['true']
+  template:
+    metadata:
+      name: karpenter-crs
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io/background
+    spec:
+      project: default
+      sources:
+      - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+        targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+        ref: values
+      - path: 'aws/karpenter-crs'
+        repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+        targetRevision: 'main'
+        helm:
+          values: |
+            karpenter:
+              settings: 
+                clusterName: {{.metadata.annotations.aws_cluster_name}}
+                eks_image:
+                  x86_64: {{.metadata.annotations.eks_image_x86_64}}
+                  arm64: {{.metadata.annotations.eks_image_arm64}}
+      destination:
+        name: '{{.name}}'
+      syncPolicy:
+        automated:
+          allowEmpty: true
+        syncOptions:
+        - CreateNamespace=true
+        retry:
+          backoff:
+            duration: 1m
+          limit: 60
