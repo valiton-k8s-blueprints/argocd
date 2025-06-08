@@ -1,4 +1,7 @@
 controller:
+  ingressClassResource:
+    name: nginx
+    default: true
   config:
     use-proxy-protocol: "true"
   service:
