@@ -18,11 +18,6 @@ spec:
                 # anything not staging or prod use this version
                 addonChartVersion: 1.16.1
                 addonChartRepository: https://kubernetes-sigs.github.io/external-dns
-              selector:
-                matchExpressions:
-                  - key: enable_external_dns
-                    operator: In
-                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
@@ -51,34 +46,13 @@ spec:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/config/{{.values.addonChart}}/values.yaml
-              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
-              - $values/config/{{.values.addonChart}}/{{.metadata.labels.cloud_provider}}.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
               domainFilters: {{.metadata.annotations.external_dns_domain_filters}}
-              policy: {{default "upsert-only" .metadata.annotations.external_dns_policy}}
-              provider:
-                name: webhook
-                webhook:
-                  image:
-                    repository: ghcr.io/inovex/external-dns-openstack-webhook
-                    tag: "1.1.0"
-                  extraVolumeMounts:
-                    - name: cloudsyaml
-                      mountPath: /etc/openstack/
-                  env:
-                    - name: OS_CLOUD
-                      value: '{{.metadata.annotations.external_dns_designate_cloud_name}}'
-                  resources: {}
-                  securityContext:
-                    runAsUser: 1000
-              extraVolumes:
-                - name: cloudsyaml
-                  secret:
-                    secretName: '{{.metadata.annotations.external_dns_designate_secret_name}}'
-
+              txtOwnerId: {{.metadata.annotations.external_dns_txt_owner_id}}
       destination:
-        namespace: '{{.metadata.annotations.external_dns_namespace}}'
+        namespace: external-dns
         name: '{{.name}}'
       syncPolicy:
         automated:

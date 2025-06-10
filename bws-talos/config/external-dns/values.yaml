@@ -1,0 +1,20 @@
+policy: sync
+provider:
+  name: webhook
+  webhook:
+    image:
+      repository: ghcr.io/inovex/external-dns-openstack-webhook
+      tag: "1.1.0"
+    extraVolumeMounts:
+      - name: cloudsyaml
+        mountPath: /etc/openstack/
+    env:
+      - name: OS_CLOUD
+        value: cloud
+    resources: {}
+    securityContext:
+      runAsUser: 1000
+extraVolumes:
+  - name: cloudsyaml
+    secret:
+      secretName: external-dns-designate-secret

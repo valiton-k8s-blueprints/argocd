@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: cert-manager-designate-webhook
+  name: designate-certmanager-webhook
   namespace: argocd
 spec:
   syncPolicy:
@@ -14,13 +14,9 @@ spec:
         generators:
           - clusters:
               values:
+                addonChart: designate-certmanager-webhook
                 addonChartVersion: v0.1.2
                 addonChartRepository: ghcr.io/stackitcloud/charts
-              selector:
-                matchExpressions:
-                  - key: enable_cert_manager_designate_webhook
-                    operator: In
-                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
@@ -35,30 +31,24 @@ spec:
                 addonChartVersion: v0.1.2
   template:
     metadata:
-      name: 'cert-manager-designate-webhook'
+      name: '{{.values.addonChart}}'
     spec:
       project: default
       sources:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - path: designate-certmanager-webhook
-          chart: designate-certmanager-webhook
+        - chart: '{{.values.addonChart}}'
           repoURL: '{{.values.addonChartRepository}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
-            releaseName: 'cert-manager-designate-webhook'
+            releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/config/cert-manager-designate-webhook/values.yaml
-              - $values/config/cert-manager-designate-webhook/{{.metadata.labels.environment}}.yaml
-            values: |
-              credentialsSecret: {{.metadata.annotations.cert_manager_designate_webhook_secret_name}}
-              certManager:
-                namespace: {{.metadata.annotations.cert_manager_namespace}}
-                serviceAccountName: {{.metadata.annotations.cert_manager_service_account_name}}
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
       destination:
-        namespace: '{{.metadata.annotations.cert_manager_namespace}}'
+        namespace: cert-manager
         name: '{{.name}}'
       syncPolicy:
         automated:

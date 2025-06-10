@@ -1,0 +1,11 @@
+storageClass:
+  enabled: false
+secret:
+  enabled: true
+  name: cinder-csi-plugin-secret
+csi:
+  plugin:
+    volumes:
+      - name: cacert
+        hostPath:
+          path: /etc/ssl/certs/ca-certificates

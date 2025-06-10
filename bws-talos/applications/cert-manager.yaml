@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: external-secrets
+  name: cert-manager
   namespace: argocd
 spec:
   goTemplate: true
@@ -14,27 +14,21 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: external-secrets
-                # anything not staging or prod use this version
-                addonChartVersion: 0.15.1
-                addonChartRepository: https://charts.external-secrets.io
-              selector:
-                matchExpressions:
-                  - key: enable_external_secrets
-                    operator: In
-                    values: ['true']
+                addonChart: cert-manager
+                addonChartVersion: 1.17.1
+                addonChartRepository: https://charts.jetstack.io
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.15.1
+                addonChartVersion: 1.17.1
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 0.15.1
+                addonChartVersion: 1.17.1
   template:
     metadata:
       name: '{{.values.addonChart}}'
@@ -51,11 +45,10 @@ spec:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/config/{{.values.addonChart}}/values.yaml
-              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
-              - $values/config/{{.values.addonChart}}/{{.metadata.labels.cloud_provider}}.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
       destination:
-        namespace: '{{.metadata.annotations.external_secrets_namespace}}'
+        namespace: cert-manager
         name: '{{.name}}'
       syncPolicy:
         automated:
