@@ -50,6 +50,7 @@ server:
     service:
       annotations:
         prometheus.io/scrape: true
+      type: NodePort
 
 configs:
   repositories:

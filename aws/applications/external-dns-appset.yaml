@@ -2,8 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: metrics-server
-  namespace: argocd
+  name: addons-aws-external-dns
 spec:
   goTemplate: true
   syncPolicy:
@@ -14,14 +13,13 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: metrics-server
-                addonChartNamespace: kube-system
+                addonChart: external-dns
                 # anything not staging or prod use this version
-                addonChartVersion: 3.12.0
-                addonChartRepository: https://kubernetes-sigs.github.io/metrics-server
+                addonChartVersion: 1.14.3
+                addonChartRepository: https://kubernetes-sigs.github.io/external-dns
               selector:
                 matchExpressions:
-                  - key: enable_metrics_server
+                  - key: enable_external_dns
                     operator: In
                     values: ['true']
           - clusters:
@@ -29,16 +27,16 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 3.12.0
+                addonChartVersion: 1.14.3
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 3.12.0
+                addonChartVersion: 1.14.3
   template:
     metadata:
-      name: '{{.values.addonChart}}'
+      name: 'addon-{{.name}}-{{.values.addonChart}}'
     spec:
       project: default
       sources:
@@ -52,21 +50,26 @@ spec:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/config/metrics-server/values.yaml
-              - $values/config/metrics-server/{{.metadata.labels.environment}}.yaml
-              - $values/config/metrics-server/{{.metadata.labels.cloud_provider}}.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
+              provider: aws
               {{- if .metadata.annotations.base_nodepool_labels}}
               nodeSelector:
                 {{.metadata.annotations.base_nodepool_labels}}
               {{- end }}
+              serviceAccount:
+                name: {{.metadata.annotations.external_dns_service_account}}
+                annotations:
+                  eks.amazonaws.com/role-arn: '{{.metadata.annotations.external_dns_iam_role_arn}}'
+              domainFilters: {{.metadata.annotations.external_dns_domain_filters}}
+              txtOwnerId: {{.metadata.annotations.aws_cluster_name}}
+              policy: {{default "upsert-only" .metadata.annotations.external_dns_policy}}
       destination:
-        namespace: '{{.values.addonChartNamespace}}'
+        namespace: '{{.metadata.annotations.external_dns_namespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
+        automated: {}
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true
+          - ServerSideApply=true # Big CRDs.

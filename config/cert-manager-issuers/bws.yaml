@@ -1,6 +1,0 @@
-acme:
-  dns01:
-    solver:
-      webhook:
-        groupName: acme.syseleven.de
-        solverName: designatedns
