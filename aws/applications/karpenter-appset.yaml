@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-aws-external-dns
+  name: addons-aws-karpenter
 spec:
   goTemplate: true
   syncPolicy:
@@ -13,13 +13,16 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: external-dns
-                # anything not staging or prod use this version
-                addonChartVersion: 1.14.3
-                addonChartRepository: https://kubernetes-sigs.github.io/external-dns
+                addonChart: karpenter
+                addonChartReleaseName: karpenter
+                addonChartRepositoryNamespace: karpenter
+                addonChartVersion: 1.3.2
+                # using oci repostory already configure in argocd
+                # argocd repo add public.ecr.aws --type helm --name aws-public-ecr --enable-oci
+                addonChartRepository: public.ecr.aws
               selector:
                 matchExpressions:
-                  - key: enable_external_dns
+                  - key: enable_karpenter
                     operator: In
                     values: ['true']
           - clusters:
@@ -27,50 +30,48 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 1.14.3
+                addonChartVersion: 1.3.2
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 1.14.3
+                addonChartVersion: 1.3.2
   template:
     metadata:
-      name: 'addon-{{.name}}-{{.values.addonChart}}'
+      name: addon-{{.name}}-{{.values.addonChart}}
     spec:
       project: default
       sources:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - chart: '{{.values.addonChart}}'
+        - chart: '{{.values.addonChartRepositoryNamespace}}/{{.values.addonChart}}'
           repoURL: '{{.values.addonChartRepository}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
-            releaseName: '{{.values.addonChart}}'
+            releaseName: '{{.values.addonChartReleaseName}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/config/{{.values.addonChart}}/values.yaml
-              - $values/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
-              - $values/config/{{.values.addonChart}}/{{.metadata.labels.cloud_provider}}.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
-              provider: aws
               {{- if .metadata.annotations.base_nodepool_labels}}
               nodeSelector:
                 {{.metadata.annotations.base_nodepool_labels}}
               {{- end }}
+              settings:
+                clusterName: {{.metadata.annotations.aws_cluster_name}}
+                interruptionQueue: {{.metadata.annotations.karpenter_sqs_queue_name}}
               serviceAccount:
-                name: {{.metadata.annotations.external_dns_service_account}}
+                name: {{.metadata.annotations.karpenter_service_account}}
                 annotations:
-                  eks.amazonaws.com/role-arn: '{{.metadata.annotations.external_dns_iam_role_arn}}'
-              domainFilters: {{.metadata.annotations.external_dns_domain_filters}}
-              txtOwnerId: {{.metadata.annotations.aws_cluster_name}}
-              policy: {{default "upsert-only" .metadata.annotations.external_dns_policy}}
+                  eks.amazonaws.com/role-arn: {{.metadata.annotations.karpenter_iam_role_arn}}
       destination:
-        namespace: '{{.metadata.annotations.external_dns_namespace}}'
+        namespace: '{{.metadata.annotations.karpenter_namespace}}'
         name: '{{.name}}'
       syncPolicy:
         automated: {}
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true # Big CRDs.
+          - ServerSideApply=true  # Big CRDs.

@@ -2,8 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: argocd
-  namespace: argocd
+  name: addons-aws-ebs-csi-resources
 spec:
   goTemplate: true
   syncPolicy:
@@ -14,14 +13,13 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: argo-cd
+                addonChart: aws-ebs-csi-classes
                 # anything not staging or prod use this version
-                addonChartVersion: 8.0.9
-                addonChartRepositoryNamespace: argocd
-                addonChartRepository: https://argoproj.github.io/argo-helm
+                addonChartVersion: 1.0.0
+                addonChartRepository: https://gitops-bridge-dev.github.io/gitops-bridge-helm-charts
               selector:
                 matchExpressions:
-                  - key: enable_argocd
+                  - key: enable_aws_ebs_csi_resources
                     operator: In
                     values: ['true']
           - clusters:
@@ -29,16 +27,16 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 8.0.9
+                addonChartVersion: 1.0.0
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 8.0.9
+                addonChartVersion: 1.0.0
   template:
     metadata:
-      name: '{{.values.addonChart}}'
+      name: addon-{{.name}}-{{.values.addonChart}}
     spec:
       project: default
       sources:
@@ -52,27 +50,14 @@ spec:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/config/argocd/values.yaml
-              - $values/config/argocd/{{.metadata.labels.environment}}.yaml
-              - $values/config/argocd/{{.metadata.labels.cloud_provider}}.yaml
-            values: |
-              {{- if .metadata.annotations.base_nodepool_labels -}}
-              global:
-                nodeSelector:
-                  {{.metadata.annotations.base_nodepool_labels}}
-              {{- end -}}
-              {{- if .metadata.annotations.argocd_hostname -}}
-              server:
-                ingress:
-                  hostname: {{.metadata.annotations.argocd_hostname}}
-              {{- end }}
+            valueFiles:
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
       destination:
-        namespace: '{{.values.addonChartRepositoryNamespace}}'
         name: '{{.name}}'
       syncPolicy:
         automated:
           prune: false
-          selfHeal: true
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true
+          - ServerSideApply=true  # Big CRDs.

@@ -1,9 +1,0 @@
-configs:
-  params:
-    server.insecure: true
-server:
-  ingress:
-    enabled: true
-    tls: true
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-http01
