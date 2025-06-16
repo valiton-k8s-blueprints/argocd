@@ -16,7 +16,7 @@ spec:
               values: ['true']
   template:
     metadata:
-      name: cert_manager-crds
+      name: cert-manager-crds
       finalizers:
         - resources-finalizer.argocd.argoproj.io/background
     spec:
