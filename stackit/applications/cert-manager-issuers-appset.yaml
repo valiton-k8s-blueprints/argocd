@@ -60,7 +60,7 @@ spec:
                   solver:
                     webook:
                       config:
-                        projectId: {{.metadata.annotations.cert_manager_acme_stackit_project_id}}
+                        projectId: {{.metadata.annotations.project_id}}
       destination:
         name: '{{.name}}'
       syncPolicy:
