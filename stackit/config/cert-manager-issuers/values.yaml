@@ -1,13 +1,12 @@
 acme:
-  url: https://acme-staging-v02.api.letsencrypt.org/directory
+  url: https://acme-v02.api.letsencrypt.org/directory
   http01:
-    enabled: true
-    ingressClassName: nginx
+    enabled: false
   dns01:
     enabled: true
     solver:
       webhook:
         groupName: acme.stackit.de
-        solverName: designatedns
+        solverName: stackit
         config:
           authTokenSecretNamespace: cert-manager
