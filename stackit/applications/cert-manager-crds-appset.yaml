@@ -25,7 +25,7 @@ spec:
       - repoURL: '{{.metadata.annotations.applications_repo_url}}'
         targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
         ref: values
-      - path: 'stackit/cert_manager-crds'
+      - path: 'stackit/cert-manager-crds'
         repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
         targetRevision: 'feature/stackit'
       destination:
