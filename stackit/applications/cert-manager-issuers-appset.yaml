@@ -16,10 +16,11 @@ spec:
                 addonChart: cert-manager-issuers
                 addonChartVersion: main
                 addonChartRepository: https://github.com/valiton-k8s-blueprints/charts.git
-              matchExpressions:
-                - key: enable_cert_manager
-                  operator: In
-                  values: ['true']
+              selector:
+                matchExpressions:
+                  - key: enable_cert_manger
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
