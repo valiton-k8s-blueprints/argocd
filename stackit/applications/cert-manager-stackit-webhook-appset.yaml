@@ -16,7 +16,7 @@ spec:
               values:
                 addonChart: stackit-cert-manager-webhook
                 addonChartVersion: 0.3.5
-                addonChartRepository: stackitcloud.github.io/stackit-cert-manager-webhook
+                addonChartRepository: https://stackitcloud.github.io/stackit-cert-manager-webhook
               matchExpressions:
                 - key: enable_cert_manager
                   operator: In
