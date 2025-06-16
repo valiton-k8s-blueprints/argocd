@@ -44,7 +44,7 @@ spec:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - path: 'stackit/cert-manager-issuers'
+        - path: 'cert-manager-issuers'
           repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
           targetRevision: 'feature/stackit'
           helm:
@@ -58,7 +58,7 @@ spec:
                 registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
                 dns01:
                   solver:
-                    webook:
+                    webhook:
                       config:
                         projectId: {{.metadata.annotations.project_id}}
       destination:
