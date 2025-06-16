@@ -1,7 +1,5 @@
 acme:
   url: https://acme-v02.api.letsencrypt.org/directory
-  http01:
-    enabled: false
   dns01:
     enabled: true
     solver:
@@ -10,3 +8,4 @@ acme:
         solverName: stackit
         config:
           authTokenSecretNamespace: cert-manager
+          projectId: test-123-project
