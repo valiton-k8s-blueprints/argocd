@@ -18,7 +18,7 @@ spec:
                 addonChartRepository: https://github.com/valiton-k8s-blueprints/charts.git
               selector:
                 matchExpressions:
-                  - key: enable_cert_manger
+                  - key: enable_cert_manager
                     operator: In
                     values: ['true']
           - clusters:
