@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-aws-karpenter
+  name: external-dns
 spec:
   goTemplate: true
   syncPolicy:
@@ -13,16 +13,13 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: karpenter
-                addonChartReleaseName: karpenter
-                addonChartRepositoryNamespace: karpenter
-                addonChartVersion: 1.5.0
-                # using oci repostory already configure in argocd
-                # argocd repo add public.ecr.aws --type helm --name aws-public-ecr --enable-oci
-                addonChartRepository: public.ecr.aws
+                addonChart: external-dns
+                # anything not staging or prod use this version
+                addonChartVersion: 1.14.3
+                addonChartRepository: https://kubernetes-sigs.github.io/external-dns
               selector:
                 matchExpressions:
-                  - key: enable_karpenter
+                  - key: enable_external_dns
                     operator: In
                     values: ['true']
           - clusters:
@@ -30,48 +27,49 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 1.5.0
+                addonChartVersion: 1.14.3
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 1.5.0
+                addonChartVersion: 1.14.3
   template:
     metadata:
-      name: addon-{{.name}}-{{.values.addonChart}}
+      name: '{{.values.addonChart}}'
     spec:
       project: default
       sources:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - chart: '{{.values.addonChartRepositoryNamespace}}/{{.values.addonChart}}'
+        - chart: '{{.values.addonChart}}'
           repoURL: '{{.values.addonChartRepository}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
-            releaseName: '{{.values.addonChartReleaseName}}'
+            releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
+              provider: aws
               {{- if .metadata.annotations.base_nodepool_labels}}
               nodeSelector:
                 {{.metadata.annotations.base_nodepool_labels}}
               {{- end }}
-              settings:
-                clusterName: {{.metadata.annotations.aws_cluster_name}}
-                interruptionQueue: {{.metadata.annotations.karpenter_sqs_queue_name}}
               serviceAccount:
-                name: {{.metadata.annotations.karpenter_service_account}}
+                name: {{.metadata.annotations.external_dns_service_account}}
                 annotations:
-                  eks.amazonaws.com/role-arn: {{.metadata.annotations.karpenter_iam_role_arn}}
+                  eks.amazonaws.com/role-arn: '{{.metadata.annotations.external_dns_iam_role_arn}}'
+              domainFilters: {{.metadata.annotations.external_dns_domain_filters}}
+              txtOwnerId: {{.metadata.annotations.aws_cluster_name}}
+              policy: {{default "upsert-only" .metadata.annotations.external_dns_policy}}
       destination:
-        namespace: '{{.metadata.annotations.karpenter_namespace}}'
+        namespace: '{{.metadata.annotations.external_dns_namespace}}'
         name: '{{.name}}'
       syncPolicy:
         automated: {}
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true  # Big CRDs.
+          - ServerSideApply=true # Big CRDs.
