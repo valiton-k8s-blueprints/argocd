@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-aws-ebs-csi-resources
+  name: aws-ebs-csi-resources
 spec:
   goTemplate: true
   syncPolicy:
@@ -36,7 +36,7 @@ spec:
                 addonChartVersion: 1.0.0
   template:
     metadata:
-      name: addon-{{.name}}-{{.values.addonChart}}
+      name: '{{.values.addonChart}}'
     spec:
       project: default
       sources:
