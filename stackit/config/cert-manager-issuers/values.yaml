@@ -1,5 +1,6 @@
 acme:
   url: https://acme-staging-v02.api.letsencrypt.org/directory
+  registrationEmail: test@example.com
   http01:
     enabled: false
   dns01:
