@@ -14,7 +14,7 @@ spec:
             - key: enable_cert_manager
               operator: In
               values: ['true']
-            - key: cert_manager_use_default_cert
+            - key: enable_cert_manager_default_cert
               operator: In
               values: ['true']
   template:
