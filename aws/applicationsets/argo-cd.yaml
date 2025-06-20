@@ -16,21 +16,26 @@ spec:
               values:
                 addonChart: argo-cd
                 # anything not staging or prod use this version
-                addonChartVersion: 8.0.9
+                addonChartVersion:  8.0.17
                 addonChartRepositoryNamespace: argocd
                 addonChartRepository: https://argoproj.github.io/argo-helm
+              selector:
+                matchExpressions:
+                  - key: enable_argocd
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 8.0.9
+                addonChartVersion: 8.0.17
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 8.0.9
+                addonChartVersion: 8.0.17
   template:
     metadata:
       name: '{{.values.addonChart}}'
@@ -50,9 +55,11 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
-              server:
-                ingress:
-                  hostname: {{.metadata.annotations.argocd_hostname}}
+              {{- if .metadata.annotations.base_nodepool_labels}}
+              global:
+                nodeSelector:
+                  {{.metadata.annotations.base_nodepool_labels}}
+              {{- end }}
       destination:
         namespace: '{{.values.addonChartRepositoryNamespace}}'
         name: '{{.name}}'
@@ -62,4 +69,4 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true
+          - ServerSideApply=true  # Big CRDs.
