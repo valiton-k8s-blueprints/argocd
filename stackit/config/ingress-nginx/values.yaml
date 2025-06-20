@@ -1,0 +1,5 @@
+controller:
+  service:
+    annotations:
+      yawol.stackit.cloud/replicas: 1
+      yawol.stackit.cloud/existingFloatingIP: 188.34.64.251
