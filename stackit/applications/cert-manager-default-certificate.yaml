@@ -41,7 +41,7 @@ spec:
             certificate:
               dnsNames:
               {{- range $domains }}
-                - {{ . | quote }}
+                - {{ . }}
               {{- end }}
       destination:
         namespace: cert-manager
