@@ -37,10 +37,8 @@ spec:
             - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
             - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
           values: |
-            {{- $domains := splitList "\n" .metadata.annotations.cert_manager_default_cert_domain_list }}
             certificate:
-              dnsNames: {{ $domains }}
-              
+              dnsNames: {{ .metadata.annotations.cert_manager_default_cert_domain_list }}
       destination:
         namespace: cert-manager
         name: '{{.name}}'
