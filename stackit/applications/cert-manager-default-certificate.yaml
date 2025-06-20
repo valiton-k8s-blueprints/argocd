@@ -38,6 +38,7 @@ spec:
             certificate:
               dnsNames:
                 {{ .metadata.annotations.cert_manager_default_cert_domain_list | toYaml }}
+      destination:
         namespace: cert-manager
         name: '{{.name}}'
       syncPolicy:
