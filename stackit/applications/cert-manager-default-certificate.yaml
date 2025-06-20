@@ -35,9 +35,12 @@ spec:
             - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-default-certificate/values.yaml
             - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-default-certificate/{{.metadata.labels.environment}}.yaml
           values: |
+            {{- $domains := fromJson .metadata.annotations.cert_manager_default_cert_domain_list }}
             certificate:
               dnsNames:
-                {{ .metadata.annotations.cert_manager_default_cert_domain_list | toYaml }}
+                {{- range $domains }}
+                  - {{ . }}
+                {{- end }}
       destination:
         namespace: cert-manager
         name: '{{.name}}'
