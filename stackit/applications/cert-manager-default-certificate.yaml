@@ -39,10 +39,7 @@ spec:
           values: |
             {{- $domains := splitList "\n" .metadata.annotations.cert_manager_default_cert_domain_list }}
             certificate:
-              dnsNames:
-              {{- range $domains }}
-                - {{ . }}
-              {{- end }}
+              dnsNames: $domains
       destination:
         namespace: cert-manager
         name: '{{.name}}'
