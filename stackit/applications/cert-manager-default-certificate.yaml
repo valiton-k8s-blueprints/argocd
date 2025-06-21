@@ -40,9 +40,9 @@ spec:
               issuerRef:
                 name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}" 
               dnsNames:
-                {{- range $domains }}
-                  - {{ . | quote}}
-                {{- end }}
+              {{- range $domains }}
+                - {{ . | quote}}
+              {{- end }}
       destination:
         namespace: cert-manager
         name: '{{.name}}'
