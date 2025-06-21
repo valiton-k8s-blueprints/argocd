@@ -54,6 +54,7 @@ spec:
                   default:
                     name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}"
                 acme:
+                  url: https://acme-v02.api.letsencrypt.org/directory
                   registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
                   dns01:
                     solver:
