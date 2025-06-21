@@ -12,10 +12,6 @@ spec:
         mergeKeys: [server]
         generators:
           - clusters:
-              values:
-                addonChart: cert-manager-issuers
-                addonChartVersion: main
-                addonChartRepository: https://github.com/valiton-k8s-blueprints/charts.git
               selector:
                 matchExpressions:
                   - key: enable_cert_manager
@@ -51,8 +47,8 @@ spec:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
-              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-issuers/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config//cert-manager-issuers/{{.metadata.labels.environment}}.yaml
             values: |
               clusterIssuer:
                 default:
