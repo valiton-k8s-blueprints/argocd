@@ -44,7 +44,7 @@ spec:
           repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
           targetRevision: 'feature/stackit'
           helm:
-            releaseName: '{{.values.addonChart}}'
+            releaseName: '{{.name}}'
             ignoreMissingValueFiles: true
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-issuers/values.yaml
