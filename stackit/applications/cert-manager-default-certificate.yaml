@@ -38,7 +38,7 @@ spec:
             {{- $domains := fromJson .metadata.annotations.cert_manager_default_cert_domain_list }}
             certificate:
                 issuerRef:
-                  name: "{{.metadata.labels.environment}}_{{.metadata.labels.cluster_name}}" 
+                  name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}" 
               dnsNames:
                 {{- range $domains }}
                   - {{ . }}

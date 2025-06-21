@@ -56,7 +56,7 @@ spec:
             values: |
               clusterIssuer:
                 default:
-                  name: "{{.metadata.labels.environment}}_{{.metadata.labels.cluster_name}}"
+                  name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}"
                 acme:
                   registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
                   dns01:
