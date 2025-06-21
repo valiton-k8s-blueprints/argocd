@@ -56,14 +56,10 @@ spec:
                 acme:
                   registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
                   dns01:
-                    enabled: true
                     solver:
                       webhook:
-                        groupName: acme.stackit.de
-                        solverName: stackit
                         config:
                           projectId: {{.metadata.annotations.project_id}}
-                          authTokenSecretNamespace: cert-manager
       destination:
         name: '{{.name}}'
       syncPolicy:
