@@ -31,7 +31,7 @@ spec:
                 addonChartVersion: main
   template:
     metadata:
-      name: '{{.values.addonChart}}'
+      name: cert-manager-issuers
       finalizers:
         - resources-finalizer.argocd.argoproj.io/background
     spec:
