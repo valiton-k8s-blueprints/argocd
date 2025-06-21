@@ -54,13 +54,16 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
-              acme:
-                registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
-                dns01:
-                  solver:
-                    webhook:
-                      config:
-                        projectId: {{.metadata.annotations.project_id}}
+              clusterIssuer:
+                default:
+                  name: "{{.metadata.labels.environment}}_{{.metadata.labels.cluster_name}}"
+                acme:
+                  registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
+                  dns01:
+                    solver:
+                      webhook:
+                        config:
+                          projectId: {{.metadata.annotations.project_id}}
       destination:
         name: '{{.name}}'
       syncPolicy:
