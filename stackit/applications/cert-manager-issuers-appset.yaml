@@ -50,9 +50,9 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-issuers/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config//cert-manager-issuers/{{.metadata.labels.environment}}.yaml
             values: |
-              clusterIssuer:
-                default:
-                  name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}"
+                clusterIssuer:
+                  default:
+                    name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}"
                 acme:
                   registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
                   dns01:
