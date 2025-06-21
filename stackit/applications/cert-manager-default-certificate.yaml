@@ -36,6 +36,7 @@ spec:
             - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-default-certificate/{{.metadata.labels.environment}}.yaml
           values: |
             {{- $domains := fromJson .metadata.annotations.cert_manager_default_cert_domain_list }}
+            debug: true
             certificate:
               issuerRef:
                 name: "{{.metadata.labels.environment}}-{{.metadata.labels.cluster_name}}" 
