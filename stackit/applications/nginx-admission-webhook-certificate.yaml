@@ -35,7 +35,7 @@ spec:
             - $values/{{.metadata.annotations.applications_repo_path}}/config/nginx-admission-webhook-certificate/values.yaml
             - $values/{{.metadata.annotations.applications_repo_path}}/config/nginx-admission-webhook-certificate/{{.metadata.labels.environment}}.yaml
       destination:
-        namespace: ingress_nginx
+        namespace: ingress-nginx
         name: '{{.name}}'
       syncPolicy:
         automated:
