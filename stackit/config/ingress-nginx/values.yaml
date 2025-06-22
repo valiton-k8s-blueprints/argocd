@@ -1,4 +1,8 @@
 controller:
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: false
   ingressClassResource:
     name: nginx
     default: true
