@@ -6,7 +6,6 @@ controller:
     externalTrafficPolicy: "Local"
   admissionWebhooks:
     enabled: true
-    secretName: ingress-nginx-admission
     certManager:
       enabled: true  # << this disables createSecretJob
     patch:
