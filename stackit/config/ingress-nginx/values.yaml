@@ -1,8 +1,11 @@
 controller:
   admissionWebhooks:
     enabled: true
+    secretName: ingress-nginx-admission
+    certManager:
+      enabled: true  # << this disables createSecretJob
     patch:
-      enabled: false
+      enabled: true  # << still needed to patch the caBundle
   ingressClassResource:
     name: nginx
     default: true
