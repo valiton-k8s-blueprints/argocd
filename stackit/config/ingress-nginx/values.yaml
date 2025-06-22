@@ -8,6 +8,7 @@ controller:
     enabled: true
     patch:
       enabled: true  # << still needed to patch the caBundle
+    secretName: ingress-nginx-admission
   ingressClassResource:
     name: nginx
     default: true
