@@ -1,4 +1,10 @@
 controller:
+  annotations:
+    yawol.stackit.cloud/tcpProxyProtocol: "true"
+  config:
+    use-proxy-protocol: "true"
+  service:
+    externalTrafficPolicy: "Local"
   admissionWebhooks:
     enabled: true
     secretName: ingress-nginx-admission
@@ -9,8 +15,5 @@ controller:
   ingressClassResource:
     name: nginx
     default: true
-  config:
-    use-proxy-protocol: "true"
-  service:
-    externalTrafficPolicy: "Local"
+
 
