@@ -9,6 +9,10 @@ controller:
     secretName: ingress-nginx-admission
     certManager:
       enabled: true  # << this disables createSecretJob
+      admissionCert:
+        issuerRef:
+        name: "selfsigned-cluster-issuer"
+        kind: "ClusterIssuer"
     patch:
       enabled: true  # << still needed to patch the caBundle
   ingressClassResource:
