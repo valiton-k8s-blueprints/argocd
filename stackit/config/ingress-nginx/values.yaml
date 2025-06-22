@@ -6,8 +6,6 @@ controller:
     externalTrafficPolicy: "Local"
   admissionWebhooks:
     enabled: true
-    certManager:
-      enabled: true  # << this disables createSecretJob
     patch:
       enabled: true  # << still needed to patch the caBundle
   ingressClassResource:
