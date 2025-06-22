@@ -1,1 +1,11 @@
-
+controller:
+  ingressClassResource:
+    name: nginx
+    default: true
+  config:
+    use-proxy-protocol: "true"
+  service:
+    externalTrafficPolicy: "Local"
+    annotations:
+      yawol.stackit.cloud/replicas: 1
+      yawol.stackit.cloud/existingFloatingIP: 188.34.64.251
