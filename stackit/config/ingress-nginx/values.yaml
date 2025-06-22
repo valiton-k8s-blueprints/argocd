@@ -6,5 +6,3 @@ controller:
     use-proxy-protocol: "true"
   service:
     externalTrafficPolicy: "Local"
-  admissionWebhooks:
-    timeoutSeconds: 60
