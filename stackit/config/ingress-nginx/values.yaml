@@ -13,5 +13,4 @@ controller:
     use-proxy-protocol: "true"
   service:
     externalTrafficPolicy: "Local"
-certManager:
-  enabled: true
+
