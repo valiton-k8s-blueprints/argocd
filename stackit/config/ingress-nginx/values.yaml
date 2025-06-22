@@ -6,9 +6,11 @@ controller:
     externalTrafficPolicy: "Local"
   admissionWebhooks:
     enabled: true
+    secretName: ingress-nginx-admission
+    certManager:
+      enabled: true  # << this disables createSecretJob
     patch:
       enabled: true  # << still needed to patch the caBundle
-    secretName: ingress-nginx-admission
   ingressClassResource:
     name: nginx
     default: true
