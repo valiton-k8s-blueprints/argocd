@@ -1,6 +1,7 @@
 controller:
   annotations:
     yawol.stackit.cloud/tcpProxyProtocol: "true"
+    yawol.stackit.cloud/tcpProxyProtocolPortsFilter: "80,443"
   service:
     externalTrafficPolicy: "Local"
   admissionWebhooks:
