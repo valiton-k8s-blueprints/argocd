@@ -51,9 +51,9 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config//cert-manager-issuers/{{.metadata.labels.environment}}.yaml
             values: |
                 clusterIssuer:
-                  dns-01:
+                  dns01:
                     name: "{{.metadata.annotations.cert_manager_dns01_issuer_name}}"
-                  http-01:
+                  http01:
                     name: "{{.metadata.annotations.cert_manager_http01_issuer_name}}"
                 acme:
                   url: https://acme-v02.api.letsencrypt.org/directory
