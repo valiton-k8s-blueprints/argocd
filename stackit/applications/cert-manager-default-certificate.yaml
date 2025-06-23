@@ -38,6 +38,7 @@ spec:
             debug: true
             certificate:
               name: "{{ .metadata.annotations.cert_manager_default_cert_name }}"
+              secretName: "{{ .metadata.annotations.cert_manager_default_cert_name }}"
               namespace: {{ .metadata.annotations.cert_manager_default_cert_namespace }}
               issuerRef:
                 {{ if eq .metadata.annotations.cert_manager_default_cert_solver_type "dns01" }}
