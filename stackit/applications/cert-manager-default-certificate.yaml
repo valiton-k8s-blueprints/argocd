@@ -37,9 +37,15 @@ spec:
           values: |
             debug: true
             certificate:
+              name: "{{ .metadata.annotations.cert_manager_default_cert_name }}"
+              namespace: {{ .metadata.annotations.cert_manager_default_cert_namespace }}
               issuerRef:
-                name: "{{ .metadata.annotations.cert_manager_default_cert_name }}"
-                namespace: {{ .metadata.annotations.cert_manager_default_cert_namespace }}
+                {{ if eq .metadata.annotations.cert_manager_default_cert_solver_type "dns01" }}
+                name: "{{ .metadata.annotations.cert_manager_dns01_issuer_name }}"
+                {{ end }}
+                {{ if eq .metadata.annotations.cert_manager_default_cert_solver_type "http01" }}
+                name: "{{ .metadata.annotations.cert_manager_http01_issuer_name }}"
+                {{ end }}
               dnsNames: {{ .metadata.annotations.cert_manager_default_cert_domain_list }}
       destination:
         namespace: cert-manager
