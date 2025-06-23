@@ -1,5 +1,0 @@
-clusterIssuer:
-  default:
-    name: production-stackit-letsencrypt-dns01
-acme:
-  url: https://acme-v02.api.letsencrypt.org/directory
