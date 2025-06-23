@@ -56,9 +56,10 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
-              admissionWebhooks:
-                certManager:
-                  enabled: {{.metadata.labels.enable_cert_manager}}
+              controller:
+                admissionWebhooks:
+                  certManager:
+                    enabled: {{.metadata.labels.enable_cert_manager}}
       destination:
         namespace: ingress-nginx
         name: '{{.name}}'
