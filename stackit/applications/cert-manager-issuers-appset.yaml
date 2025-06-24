@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cert-manager-issuers
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: enable_cert_manager
+                    operator: In
+                    values: ['true']
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
+              values:
+                addonChartVersion: main
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: production
+              values:
+                addonChartVersion: main
+  template:
+    metadata:
+      name: cert-manager-issuers
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io/background
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - path: 'stackit/cert-manager-issuers'
+          repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+          targetRevision: 'main'
+          helm:
+            releaseName: '{{.name}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-issuers/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config//cert-manager-issuers/{{.metadata.labels.environment}}.yaml
+            values: |
+                clusterIssuer:
+                  dns01:
+                    name: "{{.metadata.annotations.cert_manager_dns01_issuer_name}}"
+                  http01:
+                    name: "{{.metadata.annotations.cert_manager_http01_issuer_name}}"
+                acme:
+                  url: https://acme-v02.api.letsencrypt.org/directory
+                  registrationEmail: {{.metadata.annotations.cert_manager_acme_registration_email}}
+                  dns01:
+                    solver:
+                      webhook:
+                        config:
+                          projectId: {{.metadata.annotations.project_id}}
+      destination:
+        name: '{{.name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
