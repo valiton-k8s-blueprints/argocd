@@ -58,9 +58,6 @@ spec:
             values: |
               {{- if .metadata.annotations.enable_prometheus_federation}}
               prometheus:
-                service:
-                  type: NodePort
-                  nodePort: 30090
                 prometheusSpec:
                   additionalScrapeConfigsSecret:
                     enabled: true
