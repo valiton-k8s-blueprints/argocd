@@ -2,7 +2,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-external-secrets
+  name: argocd
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -13,13 +14,14 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: external-secrets
+                addonChart: argo-cd
                 # anything not staging or prod use this version
-                addonChartVersion: 0.9.13
-                addonChartRepository: https://charts.external-secrets.io
+                addonChartVersion:  8.1.1
+                addonChartRepositoryNamespace: argocd
+                addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
                 matchExpressions:
-                  - key: enable_external_secrets
+                  - key: enable_argocd
                     operator: In
                     values: ['true']
           - clusters:
@@ -27,13 +29,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.9.13
+                addonChartVersion: 8.1.1
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 0.9.13
+                addonChartVersion: 8.1.1
   template:
     metadata:
       name: addon-{{.name}}-{{.values.addonChart}}
@@ -52,16 +54,18 @@ spec:
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+            values: |
+              {{- if .metadata.annotations.base_nodepool_labels}}
+              global:
+                nodeSelector:
+                  {{.metadata.annotations.base_nodepool_labels}}
+              {{- end }}
       destination:
-        namespace: '{{.metadata.annotations.external_secrets_namespace}}'
+        namespace: '{{.values.addonChartRepositoryNamespace}}'
         name: '{{.name}}'
       syncPolicy:
-        automated: {}
-        syncOptions: [CreateNamespace=true, ServerSideApply=true]
-      ignoreDifferences:
-        - group: admissionregistration.k8s.io
-          kind: MutatingWebhookConfiguration
-          jqPathExpressions: ['.webhooks[].clientConfig.caBundle']
-        - group: admissionregistration.k8s.io
-          kind: ValidatingWebhookConfiguration
-          jqPathExpressions: ['.webhooks[].clientConfig.caBundle']
+        automated:
+          prune: false
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true  # Big CRDs.
