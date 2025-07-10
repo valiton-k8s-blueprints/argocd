@@ -2,7 +2,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: addons-argocd
+  name: argocd
+  namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
@@ -37,7 +38,7 @@ spec:
                 addonChartVersion: 8.1.1
   template:
     metadata:
-      name: addon-{{.name}}-{{.values.addonChart}}
+      name: '{{.values.addonChart}}'
     spec:
       project: default
       sources:
