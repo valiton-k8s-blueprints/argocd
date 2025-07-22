@@ -65,7 +65,7 @@ spec:
                     key: prometheus-additional
               {{- end }}
         - path: 'aws/prometheus-crs'
-          repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+          repoURL: 'https://github.com/chienhao096310/charts.git'
           targetRevision: 'additional-scrape-configs'
           helm:
             releaseName: 'additional-scrape-configs'
