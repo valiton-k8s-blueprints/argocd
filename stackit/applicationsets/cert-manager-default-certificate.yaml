@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cert-manager-default-certificate
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_cert_manager
+              operator: In
+              values: ['true']
+            - key: enable_cert_manager_default_cert
+              operator: In
+              values: ['true']
+  template:
+    metadata:
+      name: cert-manager-default-certificate
+    spec:
+      project: default
+      sources:
+      - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+        targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+        ref: values
+      - path: 'stackit/cert-manager-default-certificate'
+        repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+        targetRevision: 'main'
+        helm:
+          ignoreMissingValueFiles: true
+          valueFiles:
+            - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-default-certificate/values.yaml
+            - $values/{{.metadata.annotations.applications_repo_path}}/config/cert-manager-default-certificate/{{.metadata.labels.environment}}.yaml
+          values: |
+            debug: true
+            certificate:
+              name: "{{ .metadata.annotations.cert_manager_default_cert_name }}"
+              secretName: "{{ .metadata.annotations.cert_manager_default_cert_name }}"
+              namespace: {{ .metadata.annotations.cert_manager_default_cert_namespace }}
+              issuerRef:
+                {{ if eq .metadata.annotations.cert_manager_default_cert_solver_type "dns01" }}
+                name: "{{ .metadata.annotations.cert_manager_dns01_issuer_name }}"
+                {{ end }}
+                {{ if eq .metadata.annotations.cert_manager_default_cert_solver_type "http01" }}
+                name: "{{ .metadata.annotations.cert_manager_http01_issuer_name }}"
+                {{ end }}
+              dnsNames: {{ .metadata.annotations.cert_manager_default_cert_domain_list }}
+      destination:
+        namespace: cert-manager
+        name: '{{.name}}'
+      syncPolicy:
+        automated:
+          allowEmpty: true
+        syncOptions:
+        - CreateNamespace=true
+        retry:
+          backoff:
+            duration: 1m
+          limit: 60

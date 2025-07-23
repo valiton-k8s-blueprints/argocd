@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: external-secrets
+  name: argocd
   namespace: argocd
 spec:
   goTemplate: true
@@ -14,22 +14,28 @@ spec:
         generators:
           - clusters:
               values:
-                addonChart: external-secrets
+                addonChart: argo-cd
                 # anything not staging or prod use this version
-                addonChartVersion: 0.18.1
-                addonChartRepository: https://charts.external-secrets.io
+                addonChartVersion:  8.1.1
+                addonChartRepositoryNamespace: argocd
+                addonChartRepository: https://argoproj.github.io/argo-helm
+              selector:
+                matchExpressions:
+                  - key: enable_argocd
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.18.1
+                addonChartVersion: 8.1.1
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 0.18.1
+                addonChartVersion: 8.1.1
   template:
     metadata:
       name: '{{.values.addonChart}}'
@@ -48,13 +54,18 @@ spec:
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
+            values: |
+              {{- if .metadata.annotations.base_nodepool_labels}}
+              global:
+                nodeSelector:
+                  {{.metadata.annotations.base_nodepool_labels}}
+              {{- end }}
       destination:
-        namespace: 'external-secrets'
+        namespace: '{{.values.addonChartRepositoryNamespace}}'
         name: '{{.name}}'
       syncPolicy:
         automated:
-          prune: true
-          selfHeal: true
+          prune: false
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true
+          - ServerSideApply=true  # Big CRDs.

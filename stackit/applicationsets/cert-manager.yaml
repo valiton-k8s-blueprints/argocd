@@ -2,34 +2,38 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: external-secrets
+  name: cert-manager
   namespace: argocd
 spec:
   goTemplate: true
   syncPolicy:
-    preserveResourcesOnDeletion: true
+    preserveResourcesOnDeletion: false
   generators:
     - merge:
         mergeKeys: [server]
         generators:
           - clusters:
               values:
-                addonChart: external-secrets
-                # anything not staging or prod use this version
-                addonChartVersion: 0.18.1
-                addonChartRepository: https://charts.external-secrets.io
+                addonChart: cert-manager
+                addonChartVersion: 1.17.2
+                addonChartRepository: https://charts.jetstack.io
+              selector:
+                matchExpressions:
+                  - key: enable_cert_manager
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.18.1
+                addonChartVersion: 1.17.2
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 0.18.1
+                addonChartVersion: 1.17.2
   template:
     metadata:
       name: '{{.values.addonChart}}'
@@ -49,7 +53,7 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
       destination:
-        namespace: 'external-secrets'
+        namespace: cert-manager
         name: '{{.name}}'
       syncPolicy:
         automated:
