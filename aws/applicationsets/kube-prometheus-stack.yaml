@@ -57,21 +57,22 @@ spec:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
             values: |
               {{- if .metadata.annotations.enable_prometheus_federation}}
+              {{- $config := .metadata.annotations.additional_scrape_configs | fromJson }}
               prometheus:
                 prometheusSpec:
                   additionalScrapeConfigs:
-                  - job_name: {{ .metadata.annotations.additional_scrape_configs.jobName }}
-                    metrics_path: "/federate"
-                    params:
-                      "match[]":
-                        {{- range .metadata.annotations.additional_scrape_configs.matchers }}
-                          - {{ . | quote }}
-                        {{- end }}
-                    static_configs:
-                      - targets:
-                        {{- range .metadata.annotations.additional_scrape_configs.targets }}
-                          - {{ . | quote }}
-                        {{- end }}
+                    - job_name: {{ $config.jobName }}
+                      metrics_path: "/federate"
+                      params:
+                        "match[]":
+                          {{- range $config.matchers }}
+                            - {{ . | quote }}
+                          {{- end }}
+                      static_configs:
+                        - targets:
+                          {{- range $config.targets }}
+                            - {{ . | quote }}
+                          {{- end }}
               {{- end }}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
