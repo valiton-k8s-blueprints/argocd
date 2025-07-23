@@ -59,20 +59,19 @@ spec:
               {{- if .metadata.annotations.enable_prometheus_federation}}
               prometheus:
                 prometheusSpec:
-                  additionalScrapeConfigsSecret:
-                    enabled: true
-                    name: additional-scrape-configs
-                    key: prometheus-additional
-              {{- end }}
-        - path: 'aws/prometheus-crs'
-          repoURL: 'https://github.com/chienhao096310/charts.git'
-          targetRevision: 'additional-scrape-configs'
-          helm:
-            releaseName: 'additional-scrape-configs'
-            ignoreMissingValueFiles: true
-            values: |
-              {{- if .metadata.annotations.enable_prometheus_federation}}
-              additionalScrapeConfig: {{ .metadata.annotations.additional_scrape_configs }}
+                  additionalScrapeConfigs:
+                  - job_name: {{ .Values.additionalScrapeConfig.jobName }}
+                    metrics_path: "/federate"
+                    params:
+                      "match[]":
+                        {{- range .Values.additionalScrapeConfig.matchers }}
+                          - {{ . | quote }}
+                        {{- end }}
+                    static_configs:
+                      - targets:
+                        {{- range .Values.additionalScrapeConfig.targets }}
+                          - {{ . | quote }}
+                        {{- end }}
               {{- end }}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
