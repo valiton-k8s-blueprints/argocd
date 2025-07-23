@@ -60,16 +60,16 @@ spec:
               prometheus:
                 prometheusSpec:
                   additionalScrapeConfigs:
-                  - job_name: {{ .Values.additionalScrapeConfig.jobName }}
+                  - job_name: {{ .metadata.annotations.additional_scrape_configs.jobName }}
                     metrics_path: "/federate"
                     params:
                       "match[]":
-                        {{- range .Values.additionalScrapeConfig.matchers }}
+                        {{- range .metadata.annotations.additional_scrape_configs.matchers }}
                           - {{ . | quote }}
                         {{- end }}
                     static_configs:
                       - targets:
-                        {{- range .Values.additionalScrapeConfig.targets }}
+                        {{- range .metadata.annotations.additional_scrape_configs.targets }}
                           - {{ . | quote }}
                         {{- end }}
               {{- end }}
