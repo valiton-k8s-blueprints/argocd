@@ -22,7 +22,7 @@ spec:
                 matchExpressions:
                   - key: enable_kube_prometheus_stack
                     operator: In
-                    values: ['true']
+                    values: ["true"]
           - clusters:
               selector:
                 matchLabels:
@@ -37,20 +37,20 @@ spec:
                 addonChartVersion: 70.0.3
   template:
     metadata:
-      name: '{{.values.addonChart}}'
+      name: "{{.values.addonChart}}"
       finalizers:
         - resources-finalizer.argocd.argoproj.io/background
     spec:
       project: default
       sources:
-        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
-          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+        - repoURL: "{{.metadata.annotations.applications_repo_url}}"
+          targetRevision: "{{.metadata.annotations.applications_repo_revision}}"
           ref: values
-        - chart: '{{.values.addonChart}}'
-          repoURL: '{{.values.addonChartRepository}}'
-          targetRevision: '{{.values.addonChartVersion}}'
+        - chart: "{{.values.addonChart}}"
+          repoURL: "{{.values.addonChartRepository}}"
+          targetRevision: "{{.values.addonChartVersion}}"
           helm:
-            releaseName: '{{.values.addonChart}}'
+            releaseName: "{{.values.addonChart}}"
             ignoreMissingValueFiles: true
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
@@ -64,15 +64,19 @@ spec:
                     name: additional-scrape-configs
                     key: prometheus-additional
               {{- end }}
-        - path: 'aws/prometheus-crs'
-          repoURL: 'https://github.com/chienhao096310/charts.git'
-          targetRevision: 'additional-scrape-configs'
+        - path: "aws/prometheus-crs"
+          repoURL: "https://github.com/chienhao096310/charts.git"
+          targetRevision: "additional-scrape-configs"
           helm:
-            releaseName: 'additional-scrape-configs'
+            releaseName: "additional-scrape-configs"
             ignoreMissingValueFiles: true
+            values: |
+              {{- if .metadata.annotations.enable_prometheus_federation}}
+              additionalScrapeConfig: {{ .metadata.annotations.additional_scrape_configs }}
+              {{- end }}
       destination:
-        namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
-        name: '{{.name}}'
+        namespace: "{{.metadata.annotations.kube_prometheus_stack_namespace}}"
+        name: "{{.name}}"
       syncPolicy:
         automated:
           prune: true
@@ -84,7 +88,7 @@ spec:
       ignoreDifferences:
         - group: admissionregistration.k8s.io
           kind: MutatingWebhookConfiguration
-          jqPathExpressions: ['.webhooks[].clientConfig.caBundle']
+          jqPathExpressions: [".webhooks[].clientConfig.caBundle"]
         - group: admissionregistration.k8s.io
           kind: ValidatingWebhookConfiguration
-          jqPathExpressions: ['.webhooks[].clientConfig.caBundle']
+          jqPathExpressions: [".webhooks[].clientConfig.caBundle"]
