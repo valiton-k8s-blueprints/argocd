@@ -58,7 +58,7 @@ spec:
             values: |
               {{- if .metadata.annotations.enable_prometheus_federation}}
               {{- $config := .metadata.annotations.additional_scrape_configs | fromJson }}
-              prometheus:
+              prometheus: |
                 prometheusSpec:
                   additionalScrapeConfigs:
                     - job_name: {{ $config.jobName }}
