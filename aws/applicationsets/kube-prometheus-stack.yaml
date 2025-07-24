@@ -61,6 +61,7 @@ spec:
               prometheus:
                 prometheusSpec:
                   additionalScrapeConfigs: |
+
                     - job_name: {{ $config.jobName }}
                       metrics_path: "/federate"
                       params:
