@@ -55,10 +55,8 @@ spec:
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
-              # if federation is enabled, include the federation values file
-              - >
                 {{- if .metadata.annotations.is_prometheus_federation_master }}
-                $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values-federation.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values-federation.yaml
                 {{- end }}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
