@@ -18,6 +18,7 @@ spec:
                 # anything not staging or prod use this version
                 addonChartVersion: 70.0.3
                 addonChartRepository: https://prometheus-community.github.io/helm-charts
+                enableFederation: true
               selector:
                 matchExpressions:
                   - key: enable_kube_prometheus_stack
@@ -52,28 +53,11 @@ spec:
           helm:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
-            valueFiles:
+            valueFiles: |
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
-            values: |
-              {{- if .metadata.annotations.enable_prometheus_federation}}
-              {{- $config := .metadata.annotations.additional_scrape_configs | fromJson }}
-              prometheus:
-                prometheusSpec:
-                  additionalScrapeConfigs: |
-
-                    - job_name: {{ $config.jobName }}
-                      metrics_path: "/federate"
-                      params:
-                        "match[]":
-                          {{- range $config.matchers }}
-                            - {{ . | quote }}
-                          {{- end }}
-                      static_configs:
-                        - targets:
-                          {{- range $config.targets }}
-                            - {{ . | quote }}
-                          {{- end }}
+              {{- if .values.enableFederation}}
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values-federation.yaml
               {{- end }}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
