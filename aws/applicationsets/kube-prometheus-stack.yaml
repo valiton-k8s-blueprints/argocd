@@ -52,7 +52,7 @@ spec:
           helm:
             releaseName: '{{.values.addonChart}}'
             ignoreMissingValueFiles: true
-            valueFiles:
+            valueFiles: |
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
               {{- if .metadata.annotations.is_prometheus_federation_master }}
