@@ -59,7 +59,7 @@ spec:
               - >
                 {{- if .metadata.annotations.is_prometheus_federation_master }}
                 $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values-federation.yaml
-                {{- else }}
+                {{- end }}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
         name: '{{.name}}'
