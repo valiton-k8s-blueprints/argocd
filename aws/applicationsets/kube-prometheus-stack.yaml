@@ -55,9 +55,7 @@ spec:
             valueFiles:
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values.yaml
               - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{.metadata.labels.environment}}.yaml
-                {{- if .metadata.annotations.is_prometheus_federation_master }}
-                - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values-federation.yaml
-                {{- end }}
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/{{ if eq .metadata.annotations.is_prometheus_federation_master "true" }}values-federation.yaml{{ else }}noop.yaml{{ end }}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
         name: '{{.name}}'
