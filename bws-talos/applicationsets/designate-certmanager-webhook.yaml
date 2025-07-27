@@ -28,7 +28,7 @@ spec:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: v0.1.2
+                addonChartVersion: feature/remove-kubectl
   template:
     metadata:
       name: '{{.values.addonChart}}'
