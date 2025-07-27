@@ -15,20 +15,20 @@ spec:
           - clusters:
               values:
                 addonChart: designate-certmanager-webhook
-                addonChartVersion: v0.1.2
+                addonChartVersion: 0.4.0
                 addonChartRepository: ghcr.io/stackitcloud/charts
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: v0.1.2
+                addonChartVersion: 0.4.0
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: v0.1.2
+                addonChartVersion: 0.4.0
   template:
     metadata:
       name: '{{.values.addonChart}}'
@@ -38,7 +38,7 @@ spec:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - chart: '{{.values.addonChart}}'
+        - path: 'helm/designate-certmanager-webhook'
           repoURL: '{{.values.addonChartRepository}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
