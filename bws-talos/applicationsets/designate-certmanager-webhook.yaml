@@ -15,8 +15,8 @@ spec:
           - clusters:
               values:
                 addonChart: designate-certmanager-webhook
-                addonChartVersion: v0.1.2
-                addonChartRepository: ghcr.io/stackitcloud/charts
+                addonChartVersion: feature/remove-kubectl
+                addonChartRepository: https://github.com/valiton-k8s-blueprints/designate-certmanager-webhook.git
           - clusters:
               selector:
                 matchLabels:
@@ -38,7 +38,7 @@ spec:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - chart: '{{.values.addonChart}}'
+        - path: 'helm/designate-certmanager-webhook'
           repoURL: '{{.values.addonChartRepository}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
