@@ -1,0 +1,11 @@
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs: |
+      - job_name: "prometheus"
+        metrics_path: "/federate"
+        params:
+          "match[]":
+            - "{job=\"apiserver\"}"
+        static_configs:
+          - targets:
+            - "ch2.techmuc-valiton.com"
