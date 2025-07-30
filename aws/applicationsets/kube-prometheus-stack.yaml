@@ -70,7 +70,7 @@ spec:
                     {{.metadata.annotations.base_nodepool_labels}}
               grafana:
                 nodeSelector:
-                  disktype: {{.metadata.annotations.base_nodepool_labels}}
+                  {{.metadata.annotations.base_nodepool_labels}}
               kubeStateMetrics:
                 nodeSelector:
                   {{.metadata.annotations.base_nodepool_labels}}
