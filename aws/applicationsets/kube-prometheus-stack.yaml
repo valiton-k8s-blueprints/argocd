@@ -74,7 +74,7 @@ spec:
               kubeStateMetrics:
                 nodeSelector:
                   {{.metadata.annotations.base_nodepool_labels}}
-              prometheusOperator
+              prometheusOperator:
                 nodeSelector:
                   {{.metadata.annotations.base_nodepool_labels}}
       destination:
