@@ -59,6 +59,24 @@ spec:
                 {{ if eq .metadata.annotations.is_prometheus_federation_master "true" }} 
                 $values/{{.metadata.annotations.applications_repo_path}}/config/{{.values.addonChart}}/values-federation.yaml
                 {{ end }}
+            values: |
+              prometheus:
+                prometheusSpec:
+                  nodeSelector:
+                    {{.metadata.annotations.base_nodepool_labels}}
+              alertmanager:
+                alertmanagerSpec:
+                  nodeSelector:
+                    {{.metadata.annotations.base_nodepool_labels}}
+              grafana:
+                nodeSelector:
+                  disktype: {{.metadata.annotations.base_nodepool_labels}}
+              kubeStateMetrics:
+                nodeSelector:
+                  {{.metadata.annotations.base_nodepool_labels}}
+              prometheusOperator
+                nodeSelector:
+                  {{.metadata.annotations.base_nodepool_labels}}
       destination:
         namespace: '{{.metadata.annotations.kube_prometheus_stack_namespace}}'
         name: '{{.name}}'
