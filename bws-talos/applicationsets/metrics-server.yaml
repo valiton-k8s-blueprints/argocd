@@ -19,6 +19,11 @@ spec:
                 # anything not staging or prod use this version
                 addonChartVersion: 3.12.0
                 addonChartRepository: https://kubernetes-sigs.github.io/metrics-server
+              selector:
+                matchExpressions:
+                  - key: enable_metrics_server
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:

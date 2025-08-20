@@ -19,6 +19,11 @@ spec:
                 addonChartVersion:  8.0.17
                 addonChartRepositoryNamespace: argocd
                 addonChartRepository: https://argoproj.github.io/argo-helm
+              selector:
+                matchExpressions:
+                  - key: enable_argocd
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:

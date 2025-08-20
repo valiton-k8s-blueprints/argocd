@@ -17,6 +17,11 @@ spec:
                 addonChart: designate-certmanager-webhook
                 addonChartVersion: v0.1.2
                 addonChartRepository: ghcr.io/stackitcloud/charts
+              selector:
+                matchExpressions:
+                  - key: enable_cert_manager
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:

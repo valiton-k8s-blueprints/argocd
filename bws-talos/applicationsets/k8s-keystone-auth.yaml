@@ -8,7 +8,12 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - clusters: {}
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_keystone_auth
+              operator: In
+              values: ['true']
   template:
     metadata:
       name: k8s-keystone-auth

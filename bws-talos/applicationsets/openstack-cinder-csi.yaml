@@ -17,6 +17,11 @@ spec:
                 addonChart: openstack-cinder-csi
                 addonChartRepository: https://kubernetes.github.io/cloud-provider-openstack
                 addonChartVersion: 2.32.0
+              selector:
+                matchExpressions:
+                  - key: enable_openstack_cinder_csi
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:

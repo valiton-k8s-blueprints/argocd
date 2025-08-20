@@ -17,6 +17,11 @@ spec:
                 addonChart: openstack-cloud-controller-manager
                 addonChartRepository: https://kubernetes.github.io/cloud-provider-openstack
                 addonChartVersion: 2.32.0
+              selector:
+                matchExpressions:
+                  - key: enable_cloud_controller_manager
+                    operator: In
+                    values: ['true']
           - clusters:
               selector:
                 matchLabels:

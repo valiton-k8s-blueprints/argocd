@@ -8,7 +8,12 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - clusters: {}
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_cert_manager
+              operator: In
+              values: ['true']
   template:
     metadata:
       name: kubelet-serving-cert-approver
