@@ -21,7 +21,7 @@ spec:
         helm:
           releaseName: k8s-keystone-auth
           values: |
-            imageTag: v1.32.0
+            imageTag: v1.34.1
             authUrl: {{.metadata.annotations.openstack_auth_url}}
       destination:
         name: '{{.name}}'

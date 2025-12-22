@@ -16,20 +16,20 @@ spec:
               values:
                 addonChart: ingress-nginx
                 # anything not staging or prod use this version
-                addonChartVersion: 4.12.1
+                addonChartVersion: 4.14.1
                 addonChartRepository: https://kubernetes.github.io/ingress-nginx
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 4.12.1
+                addonChartVersion: 4.14.1
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 4.12.1
+                addonChartVersion: 4.14.1
   template:
     metadata:
       name: '{{.values.addonChart}}'
