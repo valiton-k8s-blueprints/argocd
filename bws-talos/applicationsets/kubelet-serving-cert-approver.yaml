@@ -17,7 +17,7 @@ spec:
       source:
         path: deploy/standalone
         repoURL: https://github.com/alex1989hu/kubelet-serving-cert-approver.git
-        targetRevision: v0.9.0
+        targetRevision: v0.10.1
       destination:
         name: '{{.name}}'
       syncPolicy:

@@ -15,20 +15,20 @@ spec:
           - clusters:
               values:
                 addonChart: cert-manager
-                addonChartVersion: 1.17.1
+                addonChartVersion: 1.19.2
                 addonChartRepository: https://charts.jetstack.io
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 1.17.1
+                addonChartVersion: 1.19.2
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 1.17.1
+                addonChartVersion: 1.19.2
   template:
     metadata:
       name: '{{.values.addonChart}}'

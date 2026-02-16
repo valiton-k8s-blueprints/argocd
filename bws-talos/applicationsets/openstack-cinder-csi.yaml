@@ -16,19 +16,19 @@ spec:
               values:
                 addonChart: openstack-cinder-csi
                 addonChartRepository: https://kubernetes.github.io/cloud-provider-openstack
-                addonChartVersion: 2.32.0
+                addonChartVersion: 2.34.1
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 2.32.0
+                addonChartVersion: 2.34.1
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 2.32.0
+                addonChartVersion: 2.34.1
   template:
     metadata:
       name: '{{.values.addonChart}}'
