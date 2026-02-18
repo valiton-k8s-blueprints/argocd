@@ -1,4 +1,6 @@
 loki:
+  auth_enabled: false
+  
   # Required for template compatibility even in SingleBinary mode
   storage:
     bucketNames:
