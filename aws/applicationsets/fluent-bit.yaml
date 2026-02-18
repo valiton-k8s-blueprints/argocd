@@ -1,0 +1,55 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fluent-bit
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: enable_logging
+              operator: In
+              values: ['true']
+  template:
+    metadata:
+      name: 'fluent-bit'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io/background
+    spec:
+      project: default
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - chart: 'fluent-bit'
+          repoURL: 'https://fluent.github.io/helm-charts'
+          targetRevision: '0.51.0'
+          helm:
+            releaseName: 'fluent-bit'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/fluent-bit/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/fluent-bit/{{.metadata.labels.environment}}.yaml
+      destination:
+        namespace: 'fluent-bit'
+        name: '{{.name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - ApplyOutOfSyncOnly=true
+      ignoreDifferences:
+        - group: admissionregistration.k8s.io
+          kind: MutatingWebhookConfiguration
+          jqPathExpressions: ['.webhooks[].clientConfig.caBundle']
+        - group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+          jqPathExpressions: ['.webhooks[].clientConfig.caBundle']
