@@ -38,8 +38,8 @@ spec:
         - repoURL: '{{.metadata.annotations.applications_repo_url}}'
           targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
           ref: values
-        - path: 'helm/designate-certmanager-webhook'
-          repoURL: '{{.values.addonChartRepository}}'
+        - repoURL: '{{.values.addonChartRepository}}'
+          chart: '{{.values.addonChart}}'
           targetRevision: '{{.values.addonChartVersion}}'
           helm:
             releaseName: '{{.values.addonChart}}'

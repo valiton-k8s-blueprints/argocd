@@ -14,15 +14,21 @@ spec:
       name: k8s-keystone-auth
     spec:
       project: default
-      source:
-        repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
-        path: 'bws/k8s-keystone-auth'
-        targetRevision: 'main'
-        helm:
-          releaseName: k8s-keystone-auth
-          values: |
-            imageTag: v1.34.1
-            authUrl: {{.metadata.annotations.openstack_auth_url}}
+      sources:
+        - repoURL: '{{.metadata.annotations.applications_repo_url}}'
+          targetRevision: '{{.metadata.annotations.applications_repo_revision}}'
+          ref: values
+        - repoURL: 'https://github.com/valiton-k8s-blueprints/charts.git'
+          path: 'bws/k8s-keystone-auth'
+          targetRevision: 'feature/keystone-auth'
+          helm:
+            releaseName: 'k8s-keystone-auth'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/k8s-keystone-auth/values.yaml
+              - $values/{{.metadata.annotations.applications_repo_path}}/config/k8s-keystone-auth/{{.metadata.labels.environment}}.yaml
+            values: |
+              authUrl: {{.metadata.annotations.openstack_auth_url}}
       destination:
         name: '{{.name}}'
       syncPolicy:
