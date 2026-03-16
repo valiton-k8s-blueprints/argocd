@@ -1,0 +1,4 @@
+credentialsSecret: designate-auth
+certManager:
+  namespace: cert-manager
+  serviceAccountName: cert-manager
