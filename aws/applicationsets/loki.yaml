@@ -18,11 +18,6 @@ spec:
                 # anything not staging or prod use this version
                 addonChartVersion: 6.39.0
                 addonChartRepository: https://grafana.github.io/helm-charts
-              selector:
-                matchExpressions:
-                  - key: enable_logging
-                    operator: In
-                    values: ['true']
           - clusters:
               selector:
                 matchLabels:
