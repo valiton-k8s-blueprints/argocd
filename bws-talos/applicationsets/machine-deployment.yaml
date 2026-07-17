@@ -72,6 +72,7 @@ spec:
           jsonPointers:
             - /metadata/generation
             - /spec/replicas
+            - /metadata/annotations/machinedeployment.clusters.k8s.io~revision
       destination:
         namespace: kube-system
         name: '{{.name}}'
@@ -82,3 +83,4 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+          - RespectIgnoreDifferences=true
