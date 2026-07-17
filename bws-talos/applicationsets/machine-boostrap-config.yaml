@@ -1,0 +1,50 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: machine-bootstrap-config
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                # anything not staging or prod use this version
+                addonVersion: feature/mc-with-kro
+                addonRepository: https://github.com/valiton-k8s-blueprints/kustomize.git
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
+              values:
+                addonVersion: feature/mc-with-kro
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: production
+              values:
+                addonVersion: feature/mc-with-kro
+  template:
+    metadata:
+      name: machine-bootstrap-config
+    spec:
+      project: default
+      source:
+        repoURL: '{{.values.addonRepository}}'
+        path: 'machine-bootstrap-config'
+        targetRevision: '{{.values.addonVersion}}'
+      destination:
+        namespace: kro-system
+        name: '{{.name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

@@ -1,0 +1,72 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: machine-controller
+  namespace: argocd
+spec:
+  goTemplate: true
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - merge:
+        mergeKeys: [server]
+        generators:
+          - clusters:
+              values:
+                # anything not staging or prod use this version
+                addonVersion: machine-controller-v1.66.0-bp.0
+                addonRepository: https://github.com/valiton-k8s-blueprints/kustomize.git
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: staging
+              values:
+                addonVersion: machine-controller-v1.66.0-bp.0
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: production
+              values:
+                addonVersion: machine-controller-v1.66.0-bp.0
+  template:
+    metadata:
+      name: machine-controller
+      annotations:
+        argocd.argoproj.io/compare-options: IncludeMutationWebhook=true
+    spec:
+      project: default
+      source:
+        repoURL: '{{.values.addonRepository}}'
+        path: 'machine-controller'
+        targetRevision: '{{.values.addonVersion}}'
+        kustomize:
+          patches:
+            - target:
+                kind: Deployment
+                name: machine-controller
+              patch: |-
+                - op: add
+                  path: "/spec/template/spec/containers/0/env/-"
+                  value:
+                    name: OS_AUTH_URL
+                    value: {{.metadata.annotations.openstack_auth_url}}
+            - target:
+                kind: Deployment
+                name: machine-controller-webhook
+              patch: |-
+                - op: add
+                  path: "/spec/template/spec/containers/0/env/-"
+                  value:
+                    name: OS_AUTH_URL
+                    value: {{.metadata.annotations.openstack_auth_url}}
+      destination:
+        namespace: kube-system
+        name: '{{.name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
