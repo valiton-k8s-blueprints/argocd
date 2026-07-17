@@ -16,20 +16,20 @@ spec:
               values:
                 addonChart: bws-machine-deployment
                 # anything not staging or prod use this version
-                addonChartVersion: 0.1.5
+                addonChartVersion: 0.1.6
                 addonChartRepository: https://valiton-k8s-blueprints.github.io/charts
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.1.5
+                addonChartVersion: 0.1.6
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 0.1.5
+                addonChartVersion: 0.1.6
   template:
     metadata:
       name: machine-deployment
