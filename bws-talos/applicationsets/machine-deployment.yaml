@@ -16,20 +16,20 @@ spec:
               values:
                 addonChart: bws-machine-deployment
                 # anything not staging or prod use this version
-                addonChartVersion: 0.1.6
+                addonChartVersion: 0.1.7
                 addonChartRepository: https://valiton-k8s-blueprints.github.io/charts
           - clusters:
               selector:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 0.1.6
+                addonChartVersion: 0.1.7
           - clusters:
               selector:
                 matchLabels:
                   environment: production
               values:
-                addonChartVersion: 0.1.6
+                addonChartVersion: 0.1.7
   template:
     metadata:
       name: machine-deployment
@@ -72,7 +72,7 @@ spec:
           jsonPointers:
             - /metadata/generation
             - /spec/replicas
-            - /metadata/annotations/machinedeployment.clusters.k8s.io~revision
+            - /metadata/annotations/machinedeployment.clusters.k8s.io~1revision
       destination:
         namespace: kube-system
         name: '{{.name}}'
